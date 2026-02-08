@@ -1,0 +1,21 @@
+# Vision Assistant - Requirements
+# ================================
+# Install: pip install -r requirements.txt
+
+# Core
+numpy>=1.24.0
+opencv-python>=4.8.0
+
+# Face Detection & Recognition
+insightface>=0.7.3
+onnxruntime-gpu>=1.16.0  # For CUDA support
+# onnxruntime>=1.16.0    # CPU-only alternative
+
+# Person Detection
+ultralytics>=8.0.0  # YOLOv8
+
+# Text-to-Speech
+pyttsx3>=2.90
+
+# Utilities
+tqdm>=4.65.0

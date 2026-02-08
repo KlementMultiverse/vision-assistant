@@ -1,0 +1,137 @@
+# =============================================================================
+# VISION ASSISTANT - GITIGNORE
+# =============================================================================
+
+# -----------------------------------------------------------------------------
+# SENSITIVE DATA - NEVER COMMIT
+# -----------------------------------------------------------------------------
+
+# API Keys and Secrets
+.env
+.env.*
+*.key
+*.pem
+secrets.json
+credentials.json
+
+# Databases (contain face embeddings and personal data)
+*.db
+*.sqlite
+*.sqlite3
+faces.db
+vision.db
+vision_test.db
+klement_test.db
+
+# Photos and captures
+*.jpg
+*.jpeg
+*.png
+*.gif
+*.bmp
+captures/
+frames/
+snapshots/
+photos/
+
+# Model files (too large, download separately)
+models/
+*.onnx
+*.pt
+*.pth
+*.bin
+*.safetensors
+*.gguf
+
+# InsightFace models (downloaded automatically)
+.insightface/
+
+# -----------------------------------------------------------------------------
+# PYTHON
+# -----------------------------------------------------------------------------
+
+# Virtual environment
+venv/
+env/
+.venv/
+.env/
+
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+
+# Distribution / packaging
+build/
+dist/
+*.egg-info/
+*.egg
+
+# Installer logs
+pip-log.txt
+pip-delete-this-directory.txt
+
+# Unit test / coverage
+htmlcov/
+.tox/
+.coverage
+.coverage.*
+.cache
+nosetests.xml
+coverage.xml
+*.cover
+.hypothesis/
+.pytest_cache/
+
+# Jupyter Notebook
+.ipynb_checkpoints
+
+# pyenv
+.python-version
+
+# -----------------------------------------------------------------------------
+# IDE / EDITOR
+# -----------------------------------------------------------------------------
+
+# VSCode
+.vscode/
+*.code-workspace
+
+# PyCharm
+.idea/
+
+# Vim
+*.swp
+*.swo
+*~
+
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+
+# -----------------------------------------------------------------------------
+# LOGS AND TEMP
+# -----------------------------------------------------------------------------
+
+*.log
+logs/
+tmp/
+temp/
+*.tmp
+
+# -----------------------------------------------------------------------------
+# PROJECT SPECIFIC
+# -----------------------------------------------------------------------------
+
+# Test outputs
+test_*.db
+*_test.db
+
+# Calibration data
+calibration_data/
+
+# Local config overrides
+config.local.yaml
+config.local.json
