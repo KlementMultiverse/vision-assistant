@@ -5,6 +5,49 @@
 
 ---
 
+## Quick Status
+
+```
+┌────────────────────────────────────────────────────────────────┐
+│                    VISION ASSISTANT                             │
+├────────────────────────────────────────────────────────────────┤
+│  v2 (Complete)  │  v3 (In Progress)                            │
+│  ✅ Face Recog   │  🔄 Phase 1: Foundation                      │
+│  ✅ Person Det   │  ⏳ Phase 2: Vision Intelligence             │
+│  ✅ Tracking     │  ⏳ Phase 3: Multi-Camera                    │
+│  ✅ Tagging      │  ⏳ Phase 4: Conversation                    │
+│  ✅ Voice TTS    │  ⏳ Phase 5: Telegram Bot                    │
+└────────────────────────────────────────────────────────────────┘
+```
+
+---
+
+## Session Completion Log
+
+### 2026-02-07: Architecture & Planning Session
+
+| Task | Status | Output |
+|------|--------|--------|
+| Architecture document | ✅ Done | `ARCHITECTURE.md` v3.0 |
+| Research document | ✅ Done | `RESEARCH.md` |
+| README updated | ✅ Done | Added architecture links |
+| GitHub push | ✅ Done | 3 commits pushed |
+| Issues created | ✅ Done | 8 issues (#1-#8) |
+| Project CLAUDE.md | ✅ Done | This file |
+| Project TRACKER.md | ✅ Done | Sprint tracking |
+| Main CLAUDE.md | ✅ Done | Added Active Projects section |
+
+**What was built:**
+- Complete system architecture with mermaid diagrams
+- Database schema (15+ tables)
+- Event-driven architecture design
+- Agent architecture with Deep Agents
+- Deployment architecture with Docker Compose
+
+**Next session:** Start Phase 1 implementation (Issues #1-#5)
+
+---
+
 ## Project Overview
 
 **Vision Assistant** is a complete Home AI system for smart security and family recognition.
@@ -25,26 +68,61 @@
 
 ---
 
-## Architecture
+## Architecture Overview
+
+```mermaid
+flowchart TB
+    subgraph Devices["Device Layer (24/7)"]
+        CAM1[Camera 1<br/>Door]
+        CAM2[Camera 2<br/>Living]
+        MIC[Microphone]
+        SPK[Speaker]
+    end
+
+    subgraph Perception["Perception Layer (GPU)"]
+        MOT[Motion<br/>Detection]
+        PER[Person<br/>Detection]
+        FAC[Face<br/>Recognition]
+    end
+
+    subgraph State["State Layer"]
+        HS[House State]
+        RS[Room States]
+        CS[Camera States]
+        PP[Person Presence]
+    end
+
+    subgraph Events["Event Bus"]
+        EB[Priority Queue<br/>CRITICAL → LOW]
+    end
+
+    subgraph Agent["Main Agent"]
+        TC[Trigger Controller]
+        MA[Deep Agents<br/>LLM Brain]
+        TOOLS[Tools:<br/>analyze_scene<br/>speak<br/>notify]
+    end
+
+    subgraph Output["Output Layer"]
+        TTS[Voice TTS]
+        TG[Telegram]
+        LOG[Event Log]
+    end
+
+    CAM1 --> MOT
+    CAM2 --> MOT
+    MOT --> PER --> FAC
+    FAC --> State
+    State --> EB
+    EB --> TC --> MA
+    MA --> TOOLS
+    TOOLS --> TTS
+    TOOLS --> TG
+    TOOLS --> LOG
+    MIC --> MA
+    MA --> SPK
+```
 
 **See:** [ARCHITECTURE.md](ARCHITECTURE.md) for complete system design.
-
-### Key Components
-
-```
-Device Layer → Perception → State Store → Event Bus → Agent → Output
-   (24/7)       (GPU)        (Memory)     (Priority)   (LLM)   (Voice/TG)
-```
-
-### Implementation Phases
-
-| Phase | Focus | Status |
-|-------|-------|--------|
-| Phase 1 | Foundation (devices, state, events, DB) | **IN PROGRESS** |
-| Phase 2 | Vision Intelligence (GPT-4o, agent) | TODO |
-| Phase 3 | Multi-Camera | TODO |
-| Phase 4 | Conversation (STT/TTS) | TODO |
-| Phase 5 | Telegram Bot | TODO |
 
 ---
 
@@ -52,11 +130,32 @@ Device Layer → Perception → State Store → Event Bus → Agent → Output
 
 | File | Purpose | Status |
 |------|---------|--------|
-| `ARCHITECTURE.md` | Complete system architecture v3.0 | Current |
-| `RESEARCH.md` | Best practices research | Current |
-| `ISSUES.md` | GitHub issues documentation | Current |
-| `README.md` | Project overview + quick start | Current |
-| `requirements.txt` | Python dependencies | Current |
+| `ARCHITECTURE.md` | Complete system architecture v3.0 | ✅ Current |
+| `RESEARCH.md` | Best practices research | ✅ Current |
+| `TRACKER.md` | Sprint tracking and progress | ✅ Current |
+| `ISSUES.md` | GitHub issues documentation | ✅ Current |
+| `README.md` | Project overview + quick start | ✅ Current |
+| `requirements.txt` | Python dependencies | ✅ Current |
+
+---
+
+## GitHub Issues
+
+### Phase 1: Foundation (Current Sprint)
+| Issue | Task | Status |
+|-------|------|--------|
+| [#1](https://github.com/KlementMultiverse/vision-assistant/issues/1) | Device Registry + Camera State | TODO |
+| [#2](https://github.com/KlementMultiverse/vision-assistant/issues/2) | State Store with Pub/Sub | TODO |
+| [#3](https://github.com/KlementMultiverse/vision-assistant/issues/3) | Event Bus | TODO |
+| [#4](https://github.com/KlementMultiverse/vision-assistant/issues/4) | Database Migration | TODO |
+| [#5](https://github.com/KlementMultiverse/vision-assistant/issues/5) | Pipeline Refactor | TODO |
+
+### Phase 2: Vision Intelligence
+| Issue | Task | Status |
+|-------|------|--------|
+| [#6](https://github.com/KlementMultiverse/vision-assistant/issues/6) | Vision Client (GPT-4o) | TODO |
+| [#7](https://github.com/KlementMultiverse/vision-assistant/issues/7) | Trigger Controller | TODO |
+| [#8](https://github.com/KlementMultiverse/vision-assistant/issues/8) | Main Agent (Deep Agents) | TODO |
 
 ---
 
@@ -91,48 +190,15 @@ src/v2/
 
 ---
 
-## GitHub Issues
-
-### Phase 1: Foundation
-- [#1](https://github.com/KlementMultiverse/vision-assistant/issues/1) Device Registry + Camera State
-- [#2](https://github.com/KlementMultiverse/vision-assistant/issues/2) State Store with Pub/Sub
-- [#3](https://github.com/KlementMultiverse/vision-assistant/issues/3) Event Bus
-- [#4](https://github.com/KlementMultiverse/vision-assistant/issues/4) Database Migration
-- [#5](https://github.com/KlementMultiverse/vision-assistant/issues/5) Pipeline Refactor
-
-### Phase 2: Vision Intelligence
-- [#6](https://github.com/KlementMultiverse/vision-assistant/issues/6) Vision Client (GPT-4o)
-- [#7](https://github.com/KlementMultiverse/vision-assistant/issues/7) Trigger Controller
-- [#8](https://github.com/KlementMultiverse/vision-assistant/issues/8) Main Agent (Deep Agents)
-
----
-
 ## Key Design Decisions
 
-### 1. Event-Driven Architecture
-- **Why:** Decouple perception from actions
-- **How:** Priority queue (CRITICAL=0, HIGH=10, NORMAL=50, LOW=100)
-- **Pattern:** Frigate-style events (NEW, UPDATE, END lifecycle)
-
-### 2. Devices as First-Class Entities
-- **Why:** Multi-camera, multi-device support
-- **How:** Device registry with status, capabilities, heartbeat
-- **Pattern:** Home Assistant hub-network-device
-
-### 3. State Hierarchy
-- **Why:** Know who's where at all times
-- **How:** HouseState → RoomState → CameraState → PersonPresence
-- **Pattern:** Centralized state store with pub/sub
-
-### 4. GPT-4o for Scene Understanding
-- **Why:** Understand context beyond face recognition
-- **How:** Structured output (Pydantic), dynamic prompts with context
-- **Pattern:** Feed known info TO vision (not just FROM)
-
-### 5. Inside vs Outside
-- **Why:** Different response requirements
-- **Outside:** Fast (GPT-4o, paid, instant response)
-- **Inside:** Relaxed (Gemini/Qwen, free, can batch)
+| Decision | Why | How |
+|----------|-----|-----|
+| Event-Driven | Decouple perception from actions | Priority queue (CRITICAL=0 → LOW=100) |
+| Devices as Entities | Multi-camera support | Device registry with status, heartbeat |
+| State Hierarchy | Know who's where | House → Room → Camera → Person |
+| GPT-4o Vision | Scene understanding | Structured output, dynamic prompts |
+| Inside vs Outside | Different response needs | Outside=fast/paid, Inside=relaxed/free |
 
 ---
 
@@ -141,9 +207,9 @@ src/v2/
 **Location:** `~/.claude/.env`
 
 Contains:
-- GITHUB_TOKEN
-- OPENAI_API_KEY (for GPT-4o)
-- TELEGRAM_BOT_TOKEN (future)
+- `GITHUB_TOKEN` - For git push and gh CLI
+- `OPENAI_API_KEY` - For GPT-4o Vision
+- `TELEGRAM_BOT_TOKEN` - For notifications (future)
 
 ---
 
@@ -151,35 +217,24 @@ Contains:
 
 ### Current (v2)
 ```bash
-# Activate venv
 source venv/bin/activate
-
-# Run live pipeline
 python -m src.v2.live_pipeline
-
-# Calibrate face threshold
-python calibrate_face.py
 ```
 
 ### Future (v3)
 ```bash
-# Docker Compose (production)
 docker compose up -d
-
-# Development
-python -m src.v2.main
 ```
 
 ---
 
-## Best Practices for This Project
+## Best Practices
 
 1. **Type hints everywhere** - All dataclasses, all functions
-2. **Immutable where possible** - `@dataclass(frozen=True)` for models
+2. **Immutable where possible** - `@dataclass(frozen=True)`
 3. **Events, not callbacks** - Publish events, subscribe handlers
 4. **Structured output** - Pydantic models for API responses
 5. **Existing code first** - Extend VisionDB, don't replace
-6. **Test with self** - Delete DB, appear as unknown, verify learning
 
 ---
 

@@ -24,6 +24,8 @@ Real-time face recognition system that learns and improves over time. Designed f
 
 ## 🏗️ Architecture
 
+### Current: v2 Pipeline
+
 ```mermaid
 flowchart TB
     subgraph Input
@@ -70,6 +72,73 @@ flowchart TB
     DB --- VISITS
 ```
 
+### Coming: v3 Full Home AI
+
+```mermaid
+flowchart TB
+    subgraph Devices["🏠 Device Layer"]
+        CAM1[📷 Door Camera]
+        CAM2[📷 Living Room]
+        CAM3[📷 Kitchen]
+        MIC[🎤 Microphone]
+        SPK[🔊 Speaker]
+    end
+
+    subgraph Perception["⚡ Perception Layer"]
+        MOT[Motion<br/>Detection]
+        PER[Person<br/>Detection]
+        FAC[Face<br/>Recognition]
+        TRK[Object<br/>Tracker]
+    end
+
+    subgraph State["💾 State Layer"]
+        HS[🏠 House State]
+        RS[📍 Room States]
+        PP[👤 Person Presence]
+    end
+
+    subgraph Events["📨 Event Bus"]
+        EB[Priority Queue<br/>🔴 CRITICAL<br/>🟠 HIGH<br/>🟡 NORMAL<br/>🟢 LOW]
+    end
+
+    subgraph Agent["🧠 Main Agent"]
+        TC[Trigger<br/>Controller]
+        DA[Deep Agents<br/>LLM Brain]
+        VIS[🔍 GPT-4o<br/>Vision]
+    end
+
+    subgraph Tools["🛠️ Agent Tools"]
+        T1[analyze_scene]
+        T2[speak]
+        T3[notify_owner]
+        T4[get_state]
+    end
+
+    subgraph Output["📤 Output Layer"]
+        TTS[🔊 Voice TTS]
+        TG[📱 Telegram]
+        LOG[📝 Event Log]
+    end
+
+    CAM1 --> MOT
+    CAM2 --> MOT
+    CAM3 --> MOT
+    MOT --> PER --> FAC --> TRK
+    TRK --> State
+    State --> EB
+    EB --> TC --> DA
+    DA --> VIS
+    DA --> Tools
+    T1 --> VIS
+    T2 --> TTS
+    T3 --> TG
+    T4 --> State
+    MIC --> DA
+    DA --> SPK
+```
+
+> **See:** [ARCHITECTURE.md](ARCHITECTURE.md) for complete system design with code examples.
+
 ---
 
 ## 📊 Data Flow
@@ -105,6 +174,8 @@ sequenceDiagram
 ---
 
 ## 🗄️ Database Schema
+
+### Current: v2 Schema
 
 ```mermaid
 erDiagram
@@ -144,6 +215,71 @@ erDiagram
         float avg_confidence
         string vision_context
         string bot_interaction
+    }
+```
+
+### Coming: v3 Extended Schema
+
+```mermaid
+erDiagram
+    DEVICES ||--o{ CAMERA_STATES : has
+    DEVICES ||--o{ ZONES : has
+    PERSONS ||--o{ EMBEDDINGS : has
+    PERSONS ||--o{ OBSERVATIONS : has
+    PERSONS ||--o{ CONVERSATIONS : has
+    OBSERVATIONS ||--o{ VISION_RESULTS : has
+    CONVERSATIONS ||--o{ MESSAGES : has
+
+    DEVICES {
+        string id PK
+        string type "camera | mic | speaker"
+        string location
+        string zone "inside | outside"
+        string status
+        json capabilities
+    }
+
+    CAMERA_STATES {
+        string camera_id FK
+        bool motion_detected
+        int persons_in_frame
+        json active_tracks
+        float fps
+    }
+
+    OBSERVATIONS {
+        int id PK
+        int person_id FK
+        string camera_id FK
+        datetime start_time
+        datetime end_time
+        json vision_context
+    }
+
+    VISION_RESULTS {
+        int id PK
+        int observation_id FK
+        string description
+        json people_detected
+        string safety_level
+        string suggested_role
+    }
+
+    HOUSE_STATE {
+        int id PK
+        string mode "home | away | night"
+        string alert_level
+        json family_home
+        json room_occupancy
+    }
+
+    EVENTS {
+        uuid id PK
+        string type
+        int priority
+        string source
+        datetime timestamp
+        json data
     }
 ```
 
