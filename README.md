@@ -325,11 +325,45 @@ Tested on RTX 4060 (8GB VRAM):
 
 ## 🔮 Roadmap
 
-- [ ] Multi-person tracking
+### Phase 1: Smart Vision (Current)
+- [x] Face recognition with auto-learning
+- [x] Person detection + tracking
+- [x] Visit logging + tagging system
+- [ ] GPT Vision for scene understanding
+- [ ] Smart pipeline (when to look, reasoning)
+
+### Phase 2: Multi-Camera Intelligence
+- [ ] Multi-camera support (unified view)
+- [ ] Multi-person tracking (no duplicates)
+- [ ] Cross-camera person linking
+- [ ] Zone detection (entry/exit triggers)
 - [ ] Context-aware greetings (family + unknown = cautious)
-- [ ] Telegram agent integration
-- [ ] Vision LLM for scene understanding
+
+### Phase 3: House Bot
+- [ ] Telegram bot integration
+- [ ] Rules engine + HITL decisions
+- [ ] House-wide awareness (all cameras linked)
+- [ ] Safety monitoring (main goal)
+- [ ] Event notifications + actions
+
+### Phase 4: Personal Assistants
+- [ ] Individual agents per family member
+- [ ] Permission system (house bot > personal agents)
+- [ ] Personal preferences + routines
+- [ ] Attach to house agent
+
+### Phase 5: Full Home AI
+- [ ] Account management (groceries, cabs, etc.)
+- [ ] Device + robot control
+- [ ] Inside + outside tracking
+- [ ] Learning + improvement over time
+- [ ] House email management
+- [ ] Cloud or on-premise deployment
+
+### Future
 - [ ] Raspberry Pi support
+- [ ] Voice assistant integration
+- [ ] Smart home ecosystem (Home Assistant, MQTT)
 
 ---
 
