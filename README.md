@@ -25,49 +25,139 @@ Real-time face recognition system that learns and improves over time. Designed f
 
 ## Architecture
 
-```
-┌─────────────────────────────────────────────────────────────────────────────┐
-│                              VISION ASSISTANT                                │
-├─────────────────────────────────────────────────────────────────────────────┤
-│                                                                             │
-│  ┌────────────────────────────────────────────────────────────────────┐    │
-│  │                        DEVICE LAYER (24/7)                          │    │
-│  │    Camera (door)  │  Camera (living)  │  Microphone  │  Speaker    │    │
-│  └──────────────────────────────┬─────────────────────────────────────┘    │
-│                                 │                                           │
-│                                 ▼                                           │
-│  ┌────────────────────────────────────────────────────────────────────┐    │
-│  │                     PERCEPTION LAYER (GPU)                          │    │
-│  │   Motion Detection → Person Detection → Face Detection → Embedding │    │
-│  │        (OpenCV)         (YOLOv8n)        (InsightFace)    (512-D)  │    │
-│  └──────────────────────────────┬─────────────────────────────────────┘    │
-│                                 │                                           │
-│                                 ▼                                           │
-│  ┌────────────────────────────────────────────────────────────────────┐    │
-│  │                    STATE STORE + EVENT BUS                          │    │
-│  │   House State  │  Room States  │  Person Presence  │  Events Queue │    │
-│  │                                                                     │    │
-│  │   Priority: CRITICAL(0) → HIGH(10) → NORMAL(50) → LOW(100)         │    │
-│  └──────────────────────────────┬─────────────────────────────────────┘    │
-│                                 │                                           │
-│                                 ▼                                           │
-│  ┌────────────────────────────────────────────────────────────────────┐    │
-│  │                      MAIN AGENT (Deep Agents)                       │    │
-│  │                                                                     │    │
-│  │   Tools: analyze_scene │ speak │ notify_owner │ get_house_state    │    │
-│  │   APIs:  GPT-4o (outside/fast) │ Free APIs (inside/relaxed)        │    │
-│  └──────────────────────────────┬─────────────────────────────────────┘    │
-│                                 │                                           │
-│                                 ▼                                           │
-│  ┌────────────────────────────────────────────────────────────────────┐    │
-│  │                         OUTPUT LAYER                                │    │
-│  │        Voice (TTS)  │  Display (UI)  │  Telegram  │  Event Logs    │    │
-│  └────────────────────────────────────────────────────────────────────┘    │
-│                                                                             │
-└─────────────────────────────────────────────────────────────────────────────┘
+### System Overview
+
+```mermaid
+flowchart TB
+    subgraph Devices["📷 Device Layer (24/7)"]
+        CAM1[Camera<br/>Door]
+        CAM2[Camera<br/>Living]
+        MIC[Microphone]
+        SPK[Speaker]
+    end
+
+    subgraph Perception["🔍 Perception Layer (GPU)"]
+        MOT[Motion<br/>OpenCV]
+        PER[Person<br/>YOLOv8n]
+        FAC[Face<br/>InsightFace]
+        EMB[Embedding<br/>512-D]
+    end
+
+    subgraph State["📊 State + Events"]
+        HS[House State]
+        PS[Person Presence]
+        EB[Event Bus<br/>Priority Queue]
+    end
+
+    subgraph Agent["🤖 Main Agent (Deep Agents)"]
+        TC[Trigger Controller]
+        MA[LLM Brain]
+        TOOLS[Tools]
+    end
+
+    subgraph Output["📢 Output Layer"]
+        TTS[Voice TTS]
+        TG[Telegram]
+        LOG[Event Log]
+    end
+
+    CAM1 & CAM2 --> MOT --> PER --> FAC --> EMB
+    EMB --> HS & PS
+    HS & PS --> EB --> TC --> MA --> TOOLS
+    MIC --> MA
+    TOOLS --> TTS & TG & LOG
+    MA --> SPK
 ```
 
-> **See:** [ARCHITECTURE.md](ARCHITECTURE.md) for complete system design with code examples.
+### Perception Pipeline
+
+```mermaid
+flowchart LR
+    subgraph Input
+        F[Frame<br/>30 fps]
+    end
+
+    subgraph Detection["Detection (GPU)"]
+        M[Motion<br/>< 1ms]
+        P[Person<br/>~10ms]
+        T[Tracker<br/>Kalman]
+    end
+
+    subgraph Recognition["Recognition (on NEW event)"]
+        FD[Face Detect]
+        FE[Face Embed]
+        DB[(Database<br/>Search)]
+    end
+
+    subgraph Events
+        E1[person_detected]
+        E2[face_recognized]
+        E3[unknown_alert]
+    end
+
+    F --> M -->|motion?| P -->|person?| T
+    T -->|NEW| FD --> FE --> DB
+    DB -->|known| E2
+    DB -->|unknown| E3
+    T -->|UPDATE/END| E1
+```
+
+### Event Priority System
+
+```mermaid
+flowchart LR
+    subgraph Events["Events by Priority"]
+        C[🔴 CRITICAL<br/>Unknown at door]
+        H[🟠 HIGH<br/>Person arrived]
+        N[🟡 NORMAL<br/>Motion detected]
+        L[🟢 LOW<br/>Heartbeat/logs]
+    end
+
+    subgraph Response
+        I[Immediate<br/>GPT-4o]
+        D[Delayed<br/>Batch]
+        S[State Update<br/>No LLM]
+    end
+
+    C --> I
+    H --> I
+    N --> D
+    L --> S
+```
+
+> **See:** [ARCHITECTURE.md](ARCHITECTURE.md) for complete system design with code examples, database schema, and deployment configuration.
+
+### Deployment Architecture
+
+```mermaid
+flowchart TB
+    subgraph Docker["Docker Compose"]
+        subgraph GPU["GPU Service"]
+            PERC[perception<br/>YOLO + InsightFace]
+        end
+
+        subgraph CPU["CPU Services"]
+            AGENT[agent<br/>Deep Agents]
+            API[api<br/>FastAPI]
+            TG[telegram<br/>Bot]
+        end
+
+        subgraph Data["Data Layer"]
+            PG[(PostgreSQL<br/>+ TimescaleDB)]
+            RD[(Redis<br/>Events/Cache)]
+        end
+    end
+
+    CAM[Cameras] --> PERC
+    PERC --> RD
+    RD --> AGENT
+    AGENT --> PG
+    API --> PG
+    TG --> RD
+
+    USER[User] --> API
+    USER --> TG
+```
 
 ---
 
@@ -111,26 +201,59 @@ python recognize_only.py
 
 ## Database Schema
 
-```
-┌─────────────┐       ┌─────────────────┐       ┌─────────────────┐
-│   devices   │       │    persons      │       │   embeddings    │
-├─────────────┤       ├─────────────────┤       ├─────────────────┤
-│ id (PK)     │       │ id (PK)         │◄──────│ person_id (FK)  │
-│ type        │       │ name            │       │ embedding       │
-│ location    │       │ group_type      │       │ confidence      │
-│ zone        │       │ role            │       │ captured_at     │
-│ status      │       │ visit_count     │       └─────────────────┘
-└──────┬──────┘       └────────┬────────┘
-       │                       │
-       ▼                       ▼
-┌─────────────────┐     ┌─────────────────┐     ┌─────────────────┐
-│  camera_states  │     │  observations   │     │ vision_results  │
-├─────────────────┤     ├─────────────────┤     ├─────────────────┤
-│ camera_id (FK)  │     │ person_id (FK)  │     │ observation_id  │
-│ motion_detected │     │ camera_id (FK)  │     │ description     │
-│ persons_count   │     │ start_time      │     │ safety_level    │
-└─────────────────┘     │ vision_context  │     └─────────────────┘
-                        └─────────────────┘
+```mermaid
+erDiagram
+    devices ||--o{ camera_states : has
+    devices ||--o{ observations : captures
+    persons ||--o{ embeddings : has
+    persons ||--o{ observations : appears_in
+    observations ||--o{ vision_results : analyzed_by
+
+    devices {
+        string id PK
+        string type
+        string location
+        string zone
+        string status
+    }
+
+    persons {
+        int id PK
+        string name
+        string group_type
+        string role
+        int visit_count
+    }
+
+    embeddings {
+        int id PK
+        int person_id FK
+        bytes embedding
+        float confidence
+        datetime captured_at
+    }
+
+    camera_states {
+        string camera_id FK
+        bool motion_detected
+        int persons_count
+        datetime updated_at
+    }
+
+    observations {
+        int id PK
+        int person_id FK
+        string camera_id FK
+        datetime start_time
+        json vision_context
+    }
+
+    vision_results {
+        int id PK
+        int observation_id FK
+        string description
+        string safety_level
+    }
 ```
 
 ---
