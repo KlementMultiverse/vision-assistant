@@ -221,12 +221,20 @@ vision-assistant/
 │       ├── live_pipeline.py      # Fast recognition + tagging
 │       └── smart_pipeline.py     # Full pipeline with auto-learn
 │
+├── docs/
+│   ├── ARCHITECTURE.md           # Complete system architecture
+│   └── RESEARCH.md               # Best practices research
+│
 ├── calibrate_face.py             # Threshold calibration
 ├── collect_data.py               # Data collection tool
 ├── recognize_only.py             # Recognition test
 ├── requirements.txt              # Dependencies
+├── ARCHITECTURE.md               # System architecture (main)
+├── RESEARCH.md                   # Research & best practices
 └── README.md
 ```
+
+> **New to the project?** Start with [ARCHITECTURE.md](ARCHITECTURE.md) for the complete system design.
 
 ---
 
